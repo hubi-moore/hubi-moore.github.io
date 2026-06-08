@@ -80,12 +80,20 @@
   .header-badge {
     font-family: var(--mono);
     font-size: 11px;
-    color: var(--green);
-    background: var(--green-bg);
-    border: 1px solid #1a4a28;
     border-radius: 20px;
     padding: 2px 10px;
     margin-left: auto;
+    transition: all 0.3s;
+  }
+  .header-badge.online {
+    color: var(--green);
+    background: var(--green-bg);
+    border: 1px solid #1a4a28;
+  }
+  .header-badge.offline {
+    color: var(--red);
+    background: #3d1a1a;
+    border: 1px solid #5a2020;
   }
 
   /* ── layout ── */
@@ -322,10 +330,9 @@
   <a class="logo" href="#"><span>~</span>/hubi-moore</a>
   <div class="nav-links">
     <a href="#skills">Skills</a>
-    <a href="#repos">Projekty</a>
     <a href="#contact">Kontakt</a>
   </div>
-  <span class="header-badge">● available</span>
+  <span class="header-badge" id="status-badge"></span>
 </header>
 
 <div class="page">
@@ -461,6 +468,26 @@
   </footer>
 
 </div>
+<script>
+  function updateStatus() {
+    const badge = document.getElementById('status-badge');
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    const isWeekday = day >= 1 && day <= 5;
+    const isWorkHour = hour >= 8 && hour < 15;
 
+    if (isWeekday && isWorkHour) {
+      badge.textContent = '● available';
+      badge.className = 'header-badge online';
+    } else {
+      badge.textContent = '● offline';
+      badge.className = 'header-badge offline';
+    }
+  }
+
+  updateStatus();
+  setInterval(updateStatus, 60 * 1000);
+</script>
 </body>
 </html>
