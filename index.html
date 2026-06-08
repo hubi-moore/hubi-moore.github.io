@@ -1,88 +1,873 @@
-Hello World<br/>
-<button id="show-popup-again">Show popup again</button>
-<button id="popup-storage-clear">Remove local storage variable</button>
-<div style="height: 1200px;">Large container</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audyt Magento 2.4.6 → 2.4.8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-#popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    z-index: 9999;
-    display: none;
-    max-width: 400px;
-}
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --red: #f85149;
+    --red-bg: #3d1a1a;
+    --yellow: #d29922;
+    --yellow-bg: #2d2208;
+    --green: #3fb950;
+    --green-bg: #122318;
+    --orange: #e3b341;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
 
-#popup-checkbox {
-    margin-right: 5px;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-#popup label {
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── top bar ── */
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-icon { font-size: 20px; }
+  .topbar-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .topbar-sub { font-size: 12px; color: var(--muted); margin-left: 0.25rem; }
+  .topbar-badge {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--red-bg);
+    color: var(--red);
+    border: 1px solid #5a2020;
+    border-radius: 20px;
+    padding: 2px 10px;
+  }
+
+  /* ── layout ── */
+  .layout { display: flex; min-height: calc(100vh - 52px); }
+
+  /* ── sidebar ── */
+  nav {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 52px;
+    height: calc(100vh - 52px);
+    overflow-y: auto;
+  }
+  nav .nav-section {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 0.75rem 1.25rem 0.25rem;
+  }
+  nav a {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.35rem 1.25rem 0.35rem 1.5rem;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--text); border-left-color: var(--border); }
+  nav a.active { color: var(--accent); border-left-color: var(--accent); }
+
+  /* ── main ── */
+  main {
+    flex: 1;
+    max-width: 860px;
+    padding: 2.5rem 3rem;
+    overflow-x: hidden;
+  }
+
+  /* ── hero ── */
+  .hero {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg2);
+    padding: 1.75rem 2rem;
+    margin-bottom: 2.5rem;
+  }
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .version-flow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+  .version-pill {
+    font-family: var(--mono);
     font-size: 14px;
-}
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 6px;
+  }
+  .v-from { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+  .v-arrow { color: var(--muted); font-size: 18px; }
+  .v-to { background: #0a2d4a; color: #58a6ff; border: 1px solid #1a4a70; }
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 1.25rem;
+  }
+  .meta-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+  .meta-card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .meta-card .value { font-size: 14px; font-weight: 500; }
+  .eol-warn { color: var(--red); }
 
-#popup-close {
+  /* ── sections ── */
+  .section { margin-bottom: 3rem; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 8px;
+  }
+  .section-title { font-size: 18px; font-weight: 600; }
+
+  /* ── status badges ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge-red { background: var(--red-bg); color: var(--red); border: 1px solid #5a2020; }
+  .badge-yellow { background: var(--yellow-bg); color: var(--orange); border: 1px solid #4a3a0a; }
+  .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid #1a4a28; }
+  .badge-gray { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── tables ── */
+  .tbl-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg3); }
+  td { padding: 10px 14px; vertical-align: top; }
+  td code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+  td .note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── blocker cards ── */
+  .blocker-list { display: flex; flex-direction: column; gap: 12px; }
+  .blocker {
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    border: 1px solid;
+    display: flex;
+    gap: 1rem;
+  }
+  .blocker-red { background: var(--red-bg); border-color: #5a2020; }
+  .blocker-yellow { background: var(--yellow-bg); border-color: #4a3a0a; }
+  .blocker-num {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 24px;
+    padding-top: 1px;
+  }
+  .blocker-red .blocker-num { color: var(--red); }
+  .blocker-yellow .blocker-num { color: var(--orange); }
+  .blocker-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .blocker-body p { font-size: 13px; color: var(--muted); }
+  .blocker-body code { font-family: var(--mono); font-size: 12px; }
+
+  /* ── timeline ── */
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before {
+    content: '';
     position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    color: #999;
-    font-size: 20px;
-}
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -1.625rem;
+    top: 12px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 2px solid var(--bg);
+  }
+  .tl-item.critical::before { background: var(--red); }
+  .tl-item.warn::before { background: var(--orange); }
+  .tl-item.normal::before { background: var(--accent); }
+  .tl-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1.1rem;
+  }
+  .tl-card .tl-top { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 4px; }
+  .tl-card .tl-step { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .tl-card .tl-env {
+    margin-left: auto;
+    font-size: 11px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 8px;
+    color: var(--muted);
+  }
+  .tl-card h4 { font-size: 13.5px; font-weight: 600; }
+  .tl-card p { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
 
+  /* ── code blocks ── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+  .code-header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .code-block pre {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    color: #c9d1d9;
+    line-height: 1.6;
+  }
+
+  /* ── php problems table ── */
+  .php-table td:first-child { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+
+  /* ── tech stack ── */
+  .stack-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .stack-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: var(--muted);
+  }
+  .stack-tag.accent { color: var(--accent); border-color: #1a4a70; background: #0a2d4a; }
+
+  /* ── info box ── */
+  .info-box {
+    border-left: 3px solid var(--accent);
+    background: #0d1f33;
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1.1rem;
+    font-size: 13.5px;
+    margin: 1rem 0;
+  }
+  .warn-box {
+    border-left: 3px solid var(--red);
+    background: var(--red-bg);
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1.1rem;
+    font-size: 13.5px;
+    margin: 1rem 0;
+    color: #f8a0a0;
+  }
+
+  @media (max-width: 768px) {
+    nav { display: none; }
+    main { padding: 1.5rem; }
+  }
 </style>
+</head>
+<body>
 
-<div id="popup">
-    <div id="popup-content">
-        <h2>Welcome to Our Website!</h2>
-        <p>Thank you for visiting our website. Sign up for our newsletter to receive the latest updates and exclusive offers.</p>
-        <form id="popup-form" action="#">
-            <input type="email" id="popup-email" placeholder="Enter your email" required />
-            <button type="submit">Sign Up</button>
-        </form>
-        <div id="popup-checkbox">
-            <input type="checkbox" id="popup-checkbox-input" />
-            <label for="popup-checkbox-input">Don't show this popup again</label>
-        </div>
-        <span id="popup-close">&times;</span>
-    </div>
+<div class="topbar">
+  <span class="topbar-icon">⬡</span>
+  <span class="topbar-title">Audyt aktualizacji Magento</span>
+  <span class="topbar-sub">/ 2.4.6-p7 → 2.4.8-p4</span>
+  <span class="topbar-badge">EOL: sierpień 2026</span>
 </div>
 
-<script type="text/javascript">
-jQuery(function ($) {
-            // Check if the popup should be shown or hidden based on the checkbox state
-            var showPopup = localStorage.getItem('popupVisible');
-            if (!showPopup) {
-                $('#popup').show();
-            }
-            // Handle popup close event 
-            $('#popup-close').on('click',function(){
-                $('#popup').hide();
-            });
-            // Handle popup show event 
-            $('#show-popup-again').on('click',function(){
-                $('#popup').show();
-            });
-            // Handle local storage variable removal 
-            $('#popup-storage-clear').on('click',function(){
-                localStorage.removeItem('popupVisible');
-            });    
-            // Handle checkbox change event
-            $('#popup-checkbox-input').change(function() {
-                if ($(this).is(':checked')) {
-                    // Hide the popup permanently
-                    localStorage.setItem('popupVisible', false);
-                    $('#popup').hide();
-                } else {
-                    // Show the popup on subsequent visits
-                    localStorage.removeItem('popupVisible');
-                    $('#popup').show();
-                }
-            });
-});    
+<div class="layout">
+
+  <nav>
+    <div class="nav-section">Nawigacja</div>
+    <a href="#podsumowanie" class="active">Podsumowanie</a>
+    <a href="#srodowisko">1. Środowisko</a>
+    <a href="#vendor">2. Moduły vendor</a>
+    <a href="#custom">3. Moduły custom</a>
+    <a href="#blokery">4. Blokery krytyczne</a>
+    <a href="#plan">5. Plan aktualizacji</a>
+  </nav>
+
+  <main>
+
+    <!-- HERO -->
+    <div class="hero" id="podsumowanie">
+      <h1>🔧 Audyt i plan aktualizacji</h1>
+      <div class="version-flow">
+        <code class="version-pill v-from">2.4.6-p7</code>
+        <span class="v-arrow">→</span>
+        <code class="version-pill v-to">2.4.8-p4</code>
+        <span style="font-size:13px; color:var(--muted)">(stabilna, marzec 2026)</span>
+      </div>
+      <div class="hero-meta">
+        <div class="meta-card">
+          <div class="label">Frontend</div>
+          <div class="value">Hyvä Theme</div>
+        </div>
+        <div class="meta-card">
+          <div class="label">Wyszukiwarka</div>
+          <div class="value">smile/elasticsuite</div>
+        </div>
+        <div class="meta-card">
+          <div class="label">Moduły vendor</div>
+          <div class="value">31 pakietów</div>
+        </div>
+        <div class="meta-card">
+          <div class="label">EOL wersji 2.4.6</div>
+          <div class="value eol-warn">sierpień 2026</div>
+        </div>
+      </div>
+      <div class="warn-box" style="margin-top:1rem; margin-bottom:0">
+        ⚠️ Moduły <code>app/code</code> — część bez <code>composer.json</code>. Wymagana inwentaryzacja przed aktualizacją.
+      </div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="section" id="srodowisko">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="section-title">Wymagania środowiskowe Magento 2.4.8</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Komponent</th>
+              <th>Aktualnie</th>
+              <th>Wymagane w 2.4.8</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>PHP</strong></td>
+              <td>8.1 (platform config)</td>
+              <td>8.3 lub 8.4 <small>(8.1 usunięty)</small></td>
+              <td><span class="badge badge-red">🔴 Wymagana zmiana</span></td>
+            </tr>
+            <tr>
+              <td><strong>MySQL / MariaDB</strong></td>
+              <td>nieznane</td>
+              <td>MySQL 8.4 LTS lub MariaDB 11.4 LTS</td>
+              <td><span class="badge badge-yellow">🟡 Weryfikacja</span></td>
+            </tr>
+            <tr>
+              <td><strong>Search engine</strong></td>
+              <td>Elasticsearch</td>
+              <td>OpenSearch 2.19 <small>(ES usunięty)</small></td>
+              <td><span class="badge badge-red">🔴 Migracja wymagana</span></td>
+            </tr>
+            <tr>
+              <td><strong>Redis / Valkey</strong></td>
+              <td>nieznane</td>
+              <td>Redis 7.2 lub Valkey 8</td>
+              <td><span class="badge badge-yellow">🟡 Weryfikacja</span></td>
+            </tr>
+            <tr>
+              <td><strong>Nginx</strong></td>
+              <td>nieznane</td>
+              <td>1.26</td>
+              <td><span class="badge badge-yellow">🟡 Weryfikacja</span></td>
+            </tr>
+            <tr>
+              <td><strong>Varnish</strong></td>
+              <td>nieznane</td>
+              <td>7.6</td>
+              <td><span class="badge badge-yellow">🟡 Weryfikacja</span></td>
+            </tr>
+            <tr>
+              <td><strong>Composer</strong></td>
+              <td>2.x</td>
+              <td>2.9.3+</td>
+              <td><span class="badge badge-yellow">🟡 Weryfikacja</span></td>
+            </tr>
+            <tr>
+              <td><strong>Node.js</strong> <small>(Hyvä build)</small></td>
+              <td>nieznane</td>
+              <td>16+ (Tailwind CSS)</td>
+              <td><span class="badge badge-yellow">🟡 Weryfikacja</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="section" id="vendor">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <span class="section-title">Inwentaryzacja modułów vendor</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Pakiet</th>
+              <th>Wersja</th>
+              <th>Status</th>
+              <th>Uwagi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>smile/elasticsuite</code></td>
+              <td><code>^2.11</code></td>
+              <td><span class="badge badge-red">🔴 Krytyczny</span></td>
+              <td>ES usunięty z M2.4.8. Migracja na OpenSearch 2.x + reindeksacja. ElasticSuite 2.11.x wspiera OpenSearch.</td>
+            </tr>
+            <tr>
+              <td><code>hyva-themes/magento2-default-theme</code></td>
+              <td><code>^1.2</code></td>
+              <td><span class="badge badge-yellow">🟡 Aktualizacja</span></td>
+              <td>Przy upgrade Magento wymagany upgrade Hyvä. Od v1.4.0 (11.2025) motyw bezpłatny (OSL-3.0). Sprawdzić child theme.</td>
+            </tr>
+            <tr>
+              <td><code>hyva-themes/magento2-luma-checkout</code></td>
+              <td><code>^1.1</code></td>
+              <td><span class="badge badge-yellow">🟡 Aktualizacja</span></td>
+              <td>Kompatybilność z Hyvä 1.4.x + M2.4.8 do potwierdzenia.</td>
+            </tr>
+            <tr>
+              <td><code>hyva-themes/magento2-smile-elasticsuite</code></td>
+              <td><code>^1.2</code></td>
+              <td><span class="badge badge-yellow">🟡 Zależy od smile</span></td>
+              <td>Moduł kompatybilności Hyvä ↔ ElasticSuite. Musi być zgodny z obiema stronami.</td>
+            </tr>
+            <tr>
+              <td><code>amasty/module-one-step-checkout-pro…</code></td>
+              <td><code>^2.4</code></td>
+              <td><span class="badge badge-yellow">🟡 Weryfikacja</span></td>
+              <td>Sprawdzić support matrix na composer.amasty.com.</td>
+            </tr>
+            <tr>
+              <td><code>amasty/…hyva-compatibility</code> (×3)</td>
+              <td><code>^1.0</code></td>
+              <td><span class="badge badge-yellow">🟡 Weryfikacja</span></td>
+              <td>Moduły Hyvä compat – zapytać Amasty o M2.4.8.</td>
+            </tr>
+            <tr>
+              <td><code>magefan/module-blog</code></td>
+              <td><code>2.10.14</code></td>
+              <td><span class="badge badge-yellow">🟡 Pinnowana</span></td>
+              <td>Wersja na sztywno – sprawdzić kompatybilność z M2.4.8 lub zaktualizować.</td>
+            </tr>
+            <tr>
+              <td><code>magefan/module-auto-related-product</code></td>
+              <td><code>2.1.4.1</code></td>
+              <td><span class="badge badge-yellow">🟡 Pinnowana</span></td>
+              <td>Jak wyżej.</td>
+            </tr>
+            <tr>
+              <td><code>przelewy24/magento2-przelewy24</code></td>
+              <td><code>^1.1</code></td>
+              <td><span class="badge badge-yellow">🟡 Krytyczne testy</span></td>
+              <td>Bramka płatności – koniecznie przetestować w staging przed wdrożeniem.</td>
+            </tr>
+            <tr>
+              <td><code>network/customcheckoutfield</code></td>
+              <td><code>dev-master</code></td>
+              <td><span class="badge badge-gray">⚠️ VCS prywatny</span></td>
+              <td>Prywatny VCS – wymagana ręczna weryfikacja kodu.</td>
+            </tr>
+            <tr>
+              <td><code>jreinke/magento2-google-shopping-feed</code></td>
+              <td><code>dev-main</code></td>
+              <td><span class="badge badge-yellow">🟡 dev-main</span></td>
+              <td>Brak wersji semver – sprawdzić repozytorium.</td>
+            </tr>
+            <tr>
+              <td><code>automattic/woocommerce</code></td>
+              <td><code>^3.1</code></td>
+              <td><span class="badge badge-red">🔴 Nieoczekiwany</span></td>
+              <td>Biblioteka PHP WooCommerce w projekcie Magento – cel nieznany, wymaga wyjaśnienia.</td>
+            </tr>
+            <tr>
+              <td><code>markshust/…disabletwofactorauth</code></td>
+              <td><code>^2.0</code></td>
+              <td><span class="badge badge-gray">⚠️ Dev only</span></td>
+              <td>Wyłącza 2FA – <strong>nie może być aktywny na produkcji</strong>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="font-size:13px; font-weight:600; margin-bottom:0.5rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em">Stack frontendowy</p>
+      <div class="stack-grid">
+        <span class="stack-tag accent">Hyvä Theme</span>
+        <span class="stack-tag accent">Tailwind CSS</span>
+        <span class="stack-tag accent">Alpine.js</span>
+        <span class="stack-tag">hyva-themes/magento2-snowdog-menu</span>
+        <span class="stack-tag">snowdog/module-menu</span>
+        <span class="stack-tag">hyva-themes/magento2-luma-checkout</span>
+        <span class="stack-tag">magefan/hyva-theme-blog</span>
+        <span class="stack-tag">monsoonconsulting/magento2-hyva-ajax-add-to-cart</span>
+        <span class="stack-tag">hyva-themes/i18n-pl-pl</span>
+        <span class="stack-tag">snowdog/language-pl_pl</span>
+        <span class="stack-tag">yireo/magento2-googletagmanager2</span>
+      </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section" id="custom">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <span class="section-title">Inwentaryzacja modułów custom (app/code)</span>
+      </div>
+
+      <div class="info-box">
+        Część modułów w <code>app/code</code> nie posiada <code>composer.json</code> — brak automatycznej kontroli wersji i deklaracji kompatybilności.
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">🖥 bash — inwentaryzacja modułów</div>
+        <pre><span style="color:#8b949e"># Lista wszystkich zarejestrowanych modułów</span>
+find app/code -name "module.xml" | while read f; do grep -h "&lt;module" "$f"; done
+
+<span style="color:#8b949e"># Status modułów</span>
+bin/magento module:status | sort</pre>
+      </div>
+
+      <p style="font-size:14px; font-weight:600; margin: 1.5rem 0 0.75rem">Typowe problemy przy przejściu PHP 8.1 → 8.3</p>
+      <div class="tbl-wrap">
+        <table class="php-table">
+          <thead>
+            <tr><th>Problem</th><th>Opis</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Typed properties</td>
+              <td>PHP 8.x wymaga inicjalizacji typed properties</td>
+            </tr>
+            <tr>
+              <td>Deprecated functions</td>
+              <td><code>str_contains</code>, <code>array_is_list</code> itp. – sprawdzić użycie</td>
+            </tr>
+            <tr>
+              <td>Przestarzałe API Magento</td>
+              <td>Sprawdzić <code>@deprecated</code> w używanych klasach core</td>
+            </tr>
+            <tr>
+              <td>Preferencje i pluginy</td>
+              <td>Zmiany w core mogą złamać <code>di.xml</code> preferences / around plugins</td>
+            </tr>
+            <tr>
+              <td>Layout XML</td>
+              <td>Zmiany w strukturze layoutów Hyvä/Magento</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">🖥 bash — analiza statyczna</div>
+        <pre>vendor/bin/phpstan analyse app/code --level=5 --php-version=8.3
+vendor/bin/php-cs-fixer fix app/code --dry-run --diff</pre>
+      </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section" id="blokery">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <span class="section-title">Blokery krytyczne</span>
+      </div>
+
+      <p style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--red); margin-bottom:0.6rem">🔴 Must-fix przed upgrade</p>
+      <div class="blocker-list" style="margin-bottom:1.5rem">
+        <div class="blocker blocker-red">
+          <div class="blocker-num">#1</div>
+          <div class="blocker-body">
+            <h4>PHP 8.1 → 8.3 / 8.4</h4>
+            <p><code>composer.json</code> ma pinned <code>"php": "8.1"</code> w platform config. Zmienić na 8.3 lub 8.4. Cały stack (FPM, CLI, extensions) musi być zgodny.</p>
+          </div>
+        </div>
+        <div class="blocker blocker-red">
+          <div class="blocker-num">#2</div>
+          <div class="blocker-body">
+            <h4>Elasticsearch → OpenSearch 2.19</h4>
+            <p>Magento 2.4.8 całkowicie usuwa wsparcie dla Elasticsearch. Wymagana migracja serwera + reindeksacja danych.</p>
+          </div>
+        </div>
+        <div class="blocker blocker-red">
+          <div class="blocker-num">#3</div>
+          <div class="blocker-body">
+            <h4>smile/elasticsuite – wersja dla M2.4.8</h4>
+            <p>Wymagana gałąź <code>2.11.x</code> (nie <code>2.10.x</code>). Dla przyszłego M2.4.9 będzie potrzebna gałąź <code>2.12.x</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--orange); margin-bottom:0.6rem">🟡 Should-fix</p>
+      <div class="blocker-list">
+        <div class="blocker blocker-yellow">
+          <div class="blocker-num">#4</div>
+          <div class="blocker-body">
+            <h4>Wersje pinnowane (Magefan)</h4>
+            <p><code>magefan/module-blog: "2.10.14"</code> i <code>magefan/module-auto-related-product: "2.1.4.1"</code> – sprawdzić kompatybilność z M2.4.8 lub zaktualizować.</p>
+          </div>
+        </div>
+        <div class="blocker blocker-yellow">
+          <div class="blocker-num">#5</div>
+          <div class="blocker-body">
+            <h4>automattic/woocommerce ^3.1</h4>
+            <p>Niestandardowa zależność w projekcie Magento – zbadać cel i usunąć jeśli niepotrzebna.</p>
+          </div>
+        </div>
+        <div class="blocker blocker-yellow">
+          <div class="blocker-num">#6</div>
+          <div class="blocker-body">
+            <h4>Moduły app/code bez composer.json</h4>
+            <p>Wymagany audyt kodu + dodanie deklaracji kompatybilności.</p>
+          </div>
+        </div>
+        <div class="blocker blocker-yellow">
+          <div class="blocker-num">#7</div>
+          <div class="blocker-body">
+            <h4>Sekcja replace w composer.json</h4>
+            <p>Zastępuje moduły Vertex i Yotpo nullem. Zweryfikować po upgrade core, czy nie są przypadkowo potrzebne.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="section" id="plan">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <span class="section-title">Plan aktualizacji (etapowy)</span>
+      </div>
+
+      <div class="info-box" style="margin-bottom:1.5rem">
+        ⏱ <strong>Szacowany czas: 3–6 tygodni</strong> — zależy od liczby problemów po aktualizacji i złożoności modułów custom w <code>app/code</code>.
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item normal">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 01</span>
+              <span class="tl-env">Lokalnie (WSL)</span>
+            </div>
+            <h4>Inwentaryzacja app/code</h4>
+            <p><code>bin/magento module:status</code>, lista modułów custom, dodanie composer.json tam gdzie możliwe.</p>
+          </div>
+        </div>
+        <div class="tl-item normal">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 02</span>
+              <span class="tl-env">Serwery + lokalne</span>
+            </div>
+            <h4>Weryfikacja środowiska</h4>
+            <p>Sprawdzić wersje PHP, MySQL, Nginx, Redis na produkcji i lokalnie.</p>
+          </div>
+        </div>
+        <div class="tl-item normal">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 03</span>
+              <span class="tl-env">Staging (Dev)</span>
+            </div>
+            <h4>Przygotowanie stagingu</h4>
+            <p>Sklonować bazę danych, pliki i konfigurację na serwer testowy.</p>
+          </div>
+        </div>
+        <div class="tl-item critical">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 04</span>
+              <span class="tl-env">Staging (Dev)</span>
+            </div>
+            <h4>Upgrade PHP 8.1 → 8.3</h4>
+            <p>Zaktualizować PHP na staging. Zmienić platform config w composer.json. Uruchomić phpstan na app/code.</p>
+          </div>
+        </div>
+        <div class="tl-item critical">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 05</span>
+              <span class="tl-env">Staging (Dev)</span>
+            </div>
+            <h4>Migracja ES → OpenSearch 2.19</h4>
+            <p>Zainstalować OpenSearch 2.19. Skonfigurować w Magento. Reindeksować.</p>
+          </div>
+        </div>
+        <div class="tl-item warn">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 06</span>
+              <span class="tl-env">Lokalnie + Staging</span>
+            </div>
+            <h4>Aktualizacja Magento</h4>
+            <p>Composer update core Magento do wersji 2.4.8-p4.</p>
+          </div>
+        </div>
+        <div class="tl-item warn">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 07</span>
+              <span class="tl-env">Staging (Dev)</span>
+            </div>
+            <h4>Aktualizacja modułów</h4>
+            <p>Rozwiązać konflikty Composer. Zaktualizować smile/elasticsuite, Hyvä, Amasty, Magefan.</p>
+          </div>
+        </div>
+        <div class="tl-item warn">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 08</span>
+              <span class="tl-env">Staging (Dev)</span>
+            </div>
+            <h4>Rebuild frontendu</h4>
+            <p>Zaktualizować Hyvä child theme, <code>npm run build</code>, deploy static content.</p>
+          </div>
+        </div>
+        <div class="tl-item normal">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 09</span>
+              <span class="tl-env">Staging (Dev)</span>
+            </div>
+            <h4>Testy</h4>
+            <p>Testy funkcjonalne, regresyjne, wydajnościowe. Weryfikacja Przelewy24 i kluczowych przepływów.</p>
+          </div>
+        </div>
+        <div class="tl-item critical">
+          <div class="tl-card">
+            <div class="tl-top">
+              <span class="tl-step">Etap 10</span>
+              <span class="tl-env">Produkcja</span>
+            </div>
+            <h4>Wdrożenie produkcyjne</h4>
+            <p>Maintenance mode → upgrade → cache flush → testy smoke.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer style="border-top:1px solid var(--border); padding-top:1.5rem; margin-top:2rem; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px">
+      <span>Magento Upgrade Audit · 2.4.6-p7 → 2.4.8-p4</span>
+      <span>Szacowany czas: 3–6 tygodni</span>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.section, .hero');
+  const links = document.querySelectorAll('nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const target = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (target) target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.25 });
+  sections.forEach(s => observer.observe(s));
 </script>
+</body>
+</html>
