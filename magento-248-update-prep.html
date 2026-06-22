@@ -52,13 +52,13 @@
   .topbar-icon { font-size: 20px; }
   .topbar-title { font-weight: 600; font-size: 14px; color: var(--text); }
   .topbar-sub { font-size: 12px; color: var(--muted); margin-left: 0.25rem; }
-  .topbar-badge {
+ .topbar-badge {
     margin-left: auto;
     font-family: var(--mono);
     font-size: 11px;
-    background: var(--red-bg);
-    color: var(--red);
-    border: 1px solid #5a2020;
+    background: var(--green-bg);
+    color: var(--green);
+    border: 1px solid #1a4a28;
     border-radius: 20px;
     padding: 2px 10px;
   }
@@ -191,6 +191,7 @@
   .badge-yellow { background: var(--yellow-bg); color: var(--orange); border: 1px solid #4a3a0a; }
   .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid #1a4a28; }
   .badge-gray { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+  .badge-blue { background: #0a2d4a; color: var(--accent); border: 1px solid #1a4a70; }
 
   /* ── tables ── */
   .tbl-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 8px; border: 1px solid var(--border); }
@@ -360,7 +361,15 @@
     margin: 1rem 0;
     color: #f8a0a0;
   }
-
+  .success-box {
+    border-left: 3px solid var(--green);
+    background: var(--green-bg);
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1.1rem;
+    font-size: 13.5px;
+    margin: 1rem 0;
+    color: #a0f0b0;
+  }
   @media (max-width: 768px) {
     nav { display: none; }
     main { padding: 1.5rem; }
@@ -386,6 +395,7 @@
     <a href="#custom">3. Moduły custom</a>
     <a href="#blokery">4. Blokery krytyczne</a>
     <a href="#plan">5. Plan aktualizacji</a>
+    <a href="#wykonana">6. Wykonana aktualizacja</a>
   </nav>
 
   <main>
@@ -936,7 +946,19 @@
           </tbody>
         </table>
       </div>
- 
+       <div class="blocker blocker-yellow" style="margin: 1.5rem 0;">
+        <div class="blocker-num">⚠️</div>
+        <div class="blocker-body">
+          <h4>Magefan przeszedł na model płatny (freemium)</h4>
+          <p>Od nowszych wersji Magefan ogranicza funkcje do wersji Plus/Extra. Dotyczy co najmniej dwóch modułów w projekcie:</p>
+          <br>
+          <p><strong style="color:var(--text)">magefan/module-auto-related-product</strong> — Display Modes: <code>From Same Category Only</code>, <code>Only With Higher Price</code>, <code>Only With Lower Price</code> są zablokowane w wersji Basic. Reguła ID:1 (<em>Products from The Same Category</em>) działa poprawnie po aktualizacji do 2.4.0 - ciężko stwierdzić kiedy przestanie</p>
+          <br>
+          <p><strong style="color:var(--text)">magefan/module-blog</strong> — do weryfikacji, które funkcje wymagają licencji płatnej w aktualnie używanej wersji <code>2.10.14</code>.</p>
+          <br>
+          <p><strong>Opcje do rozważenia:</strong> zakup licencji Plus/Extra od Magefan, powrót do starszej wersji modułu (max 2.4.0 bez ograniczeń), lub wymiana na alternatywny moduł powiązanych produktów.</p>
+        </div>
+      </div>
       <p style="font-size:14px; font-weight:600; margin: 1.5rem 0 0.75rem">Usunięte zależności</p>
       <div class="tbl-wrap">
         <table>
@@ -969,7 +991,7 @@
       </div>
  
       <div class="info-box" style="margin-top:1.5rem">
-        🧪 <strong>Do weryfikacji na dev:</strong> koszyk, checkout, płatności Przelewy24, wyszukiwarka (ElasticSuite), powiązane produkty, blog Magefan, załączniki do produktów (lizardmedia).
+        🧪 <strong>Do weryfikacji na dev:</strong> koszyk, checkout, płatności Przelewy24, wyszukiwarka (ElasticSuite - powinno byc oparte na OpenSearch), powiązane produkty, blog Magefan, załączniki do produktów (lizardmedia).
       </div>
     </div> 
     <footer style="border-top:1px solid var(--border); padding-top:1.5rem; margin-top:2rem; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px">
