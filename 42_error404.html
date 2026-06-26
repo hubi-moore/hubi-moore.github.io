@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>42 Bites – Nie znaleziono strony</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #F7F3EC;
+      --forest:  #2D4A2D;
+      --bark:    #8B5A2B;
+      --mustard: #C8943A;
+      --mist:    #E8E0D0;
+    }
+
+    body {
+      background: var(--cream);
+      color: var(--forest);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow: hidden;
+    }
+
+    .bg-number {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 0;
+      user-select: none;
+    }
+
+    .bg-number span {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(280px, 40vw, 520px);
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--mist);
+      letter-spacing: -0.04em;
+    }
+
+    .stage {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .paw-wrap {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .orbit {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px dashed var(--mist);
+      animation: spin 18s linear infinite;
+    }
+
+    .orbit::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--mustard);
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .paw-icon {
+      width: 64px;
+      height: 64px;
+      animation: breathe 3.5s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(0.92); opacity: 0.8; }
+    }
+
+    .label {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--mustard);
+      margin-bottom: 0.9rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: center;
+      color: var(--forest);
+      margin-bottom: 1rem;
+    }
+
+    h1 em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--bark);
+    }
+
+    .sub {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #4a6240;
+      text-align: center;
+      max-width: 360px;
+      margin-bottom: 3rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.1s, border-color 0.18s;
+    }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-solid {
+      background: var(--forest);
+      color: var(--cream);
+      border: 1.5px solid var(--forest);
+    }
+    .btn-solid:hover { background: var(--bark); border-color: var(--bark); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--forest);
+      border: 1.5px solid var(--mist);
+    }
+    .btn-outline:hover { border-color: var(--bark); color: var(--bark); }
+
+    .pills {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pill {
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid var(--mist);
+      font-size: 0.8rem;
+      color: #4a6240;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      background: transparent;
+    }
+    .pill:hover {
+      background: var(--forest);
+      color: var(--cream);
+      border-color: var(--forest);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .orbit, .paw-icon { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-number" aria-hidden="true"><span>404</span></div>
+
+<div class="stage">
+
+  <div class="paw-wrap">
+    <div class="orbit" aria-hidden="true"></div>
+    <svg class="paw-icon" viewBox="0 0 48.839 48.839" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path fill="#2D4A2D" d="M39.041,36.843c2.054,3.234,3.022,4.951,3.022,6.742c0,3.537-2.627,5.252-6.166,5.252
+        c-1.56,0-2.567-0.002-5.112-1.326c0,0-1.649-1.509-5.508-1.354c-3.895-0.154-5.545,1.373-5.545,1.373
+        c-2.545,1.323-3.516,1.309-5.074,1.309c-3.539,0-6.168-1.713-6.168-5.252c0-1.791,0.971-3.506,3.024-6.742
+        c0,0,3.881-6.445,7.244-9.477c2.43-2.188,5.973-2.18,5.973-2.18h1.093v-0.001c0,0,3.698-0.009,5.976,2.181
+        C35.059,30.51,39.041,36.844,39.041,36.843z M16.631,20.878c3.7,0,6.699-4.674,6.699-10.439S20.331,0,16.631,0
+        S9.932,4.674,9.932,10.439S12.931,20.878,16.631,20.878z M10.211,30.988c2.727-1.259,3.349-5.723,1.388-9.971
+        s-5.761-6.672-8.488-5.414s-3.348,5.723-1.388,9.971C3.684,29.822,7.484,32.245,10.211,30.988z M32.206,20.878
+        c3.7,0,6.7-4.674,6.7-10.439S35.906,0,32.206,0s-6.699,4.674-6.699,10.439C25.507,16.204,28.506,20.878,32.206,20.878z
+        M45.727,15.602c-2.728-1.259-6.527,1.165-8.488,5.414s-1.339,8.713,1.389,9.972c2.728,1.258,6.527-1.166,8.488-5.414
+        S48.455,16.861,45.727,15.602z"/>
+    </svg>
+  </div>
+
+  <p class="label">42 Bites · Zgubiony trop</p>
+
+  <h1>Ten adres<br>prowadzi <em>donikąd</em></h1>
+
+  <p class="sub">Strona, której szukasz, już tu nie mieszka — albo nigdy nie istniała. Wróćmy na właściwy szlak.</p>
+
+  <div class="actions">
+    <a href="/" class="btn btn-solid">Strona główna</a>
+    <a href="/dobierz-zestaw" class="btn btn-outline">Dobierz gryzaki</a>
+  </div>
+
+  <div class="pills">
+    <a href="/zestawy-tematyczne-gryzakow" class="pill">Zestawy</a>
+    <a href="/quiz" class="pill">Quiz</a>
+    <a href="/testery-gryzakow-sample" class="pill">Testery</a>
+    <a href="/blog" class="pill">Blog</a>
+    <a href="/contact" class="pill">Kontakt</a>
+  </div>
+
+</div>
+
+</body>
+</html>
