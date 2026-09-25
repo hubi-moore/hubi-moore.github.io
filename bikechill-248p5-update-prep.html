@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BikeChill 2.4.8-p3 → p5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --red: #f85149;
+    --red-bg: #3d1a1a;
+    --yellow: #d29922;
+    --yellow-bg: #2d2208;
+    --green: #3fb950;
+    --green-bg: #122318;
+    --orange: #e3b341;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── top bar ── */
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-icon { font-size: 20px; }
+  .topbar-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .topbar-sub { font-size: 12px; color: var(--muted); margin-left: 0.25rem; }
+ .topbar-badge {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--green-bg);
+    color: var(--green);
+    border: 1px solid #1a4a28;
+    border-radius: 20px;
+    padding: 2px 10px;
+  }
+
+  /* ── layout ── */
+  .layout { display: flex; min-height: calc(100vh - 52px); }
+
+  /* ── sidebar ── */
+  nav {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 52px;
+    height: calc(100vh - 52px);
+    overflow-y: auto;
+  }
+  nav .nav-section {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 0.75rem 1.25rem 0.25rem;
+  }
+  nav a {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.35rem 1.25rem 0.35rem 1.5rem;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--text); border-left-color: var(--border); }
+  nav a.active { color: var(--accent); border-left-color: var(--accent); }
+
+  /* ── main ── */
+  main {
+    flex: 1;
+    max-width: 860px;
+    padding: 2.5rem 3rem;
+    overflow-x: hidden;
+  }
+
+  /* ── hero ── */
+  .hero {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg2);
+    padding: 1.75rem 2rem;
+    margin-bottom: 2.5rem;
+  }
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .version-flow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+  .version-pill {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 6px;
+  }
+  .v-from { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+  .v-arrow { color: var(--muted); font-size: 18px; }
+  .v-to { background: #0a2d4a; color: #58a6ff; border: 1px solid #1a4a70; }
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 1.25rem;
+  }
+  .meta-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+  .meta-card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .meta-card .value { font-size: 14px; font-weight: 500; }
+  .eol-warn { color: var(--red); }
+
+  /* ── sections ── */
+  .section { margin-bottom: 3rem; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 8px;
+  }
+  .section-title { font-size: 18px; font-weight: 600; }
+
+  /* ── status badges ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge-red { background: var(--red-bg); color: var(--red); border: 1px solid #5a2020; }
+  .badge-yellow { background: var(--yellow-bg); color: var(--orange); border: 1px solid #4a3a0a; }
+  .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid #1a4a28; }
+  .badge-gray { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+  .badge-blue { background: #0a2d4a; color: var(--accent); border: 1px solid #1a4a70; }
+
+  /* ── tables ── */
+  .tbl-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg3); }
+  td { padding: 10px 14px; vertical-align: top; }
+  td code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+  td .note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── blocker cards ── */
+  .blocker-list { display: flex; flex-direction: column; gap: 12px; }
+  .blocker {
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    border: 1px solid;
+    display: flex;
+    gap: 1rem;
+  }
+  .blocker-red { background: var(--red-bg); border-color: #5a2020; }
+  .blocker-yellow { background: var(--yellow-bg); border-color: #4a3a0a; }
+  .blocker-num {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 24px;
+    padding-top: 1px;
+  }
+  .blocker-red .blocker-num { color: var(--red); }
+  .blocker-yellow .blocker-num { color: var(--orange); }
+  .blocker-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .blocker-body p { font-size: 13px; color: var(--muted); }
+  .blocker-body code { font-family: var(--mono); font-size: 12px; }
+
+  /* ── timeline ── */
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -1.625rem;
+    top: 12px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 2px solid var(--bg);
+  }
+  .tl-item.critical::before { background: var(--red); }
+  .tl-item.warn::before { background: var(--orange); }
+  .tl-item.normal::before { background: var(--accent); }
+  .tl-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1.1rem;
+  }
+  .tl-card .tl-top { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 4px; }
+  .tl-card .tl-step { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .tl-card .tl-env {
+    margin-left: auto;
+    font-size: 11px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 8px;
+    color: var(--muted);
+  }
+  .tl-card h4 { font-size: 13.5px; font-weight: 600; }
+  .tl-card p { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+
+  /* ── code blocks ── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+  .code-header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .code-block pre {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    color: #c9d1d9;
+    line-height: 1.6;
+  }
+
+  /* ── php problems table ── */
+  .php-table td:first-child { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+
+  /* ── tech stack ── */
+  .stack-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .stack-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: var(--muted);
+  }
+  .stack-tag.accent { color: var(--accent); border-color: #1a4a70; background: #0a2d4a; }
+
+  /* ── info box ── */
+  .info-box {
+    border-left: 3px solid var(--accent);
+    background: #0d1f33;
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1.1rem;
+    font-size: 13.5px;
+    margin: 1rem 0;
+  }
+  .warn-box {
+    border-left: 3px solid var(--red);
+    background: var(--red-bg);
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1.1rem;
+    font-size: 13.5px;
+    margin: 1rem 0;
+    color: #f8a0a0;
+  }
+  .success-box {
+    border-left: 3px solid var(--green);
+    background: var(--green-bg);
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1.1rem;
+    font-size: 13.5px;
+    margin: 1rem 0;
+    color: #a0f0b0;
+  }
+  @media (max-width: 768px) {
+    nav { display: none; }
+    main { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-icon">⬡</span>
+  <span class="topbar-title">BikeChill – analiza przed aktualizacją</span>
+  <span class="topbar-sub">/ 2.4.8-p3 → 2.4.8-p5</span>
+  <span class="topbar-badge">✅ Analiza zakończona</span>
+</div>
+
+<div class="layout">
+
+  <nav>
+    <div class="nav-section">Nawigacja</div>
+    <a href="#podsumowanie" class="active">Podsumowanie</a>
+    <a href="#blokery">1. Do zrobienia na PROD</a>
+    <a href="#srodowisko">2. Środowiska</a>
+    <a href="#stg">3. STG vs PROD</a>
+    <a href="#vendor">4. Moduły vendor</a>
+    <a href="#custom">5. Moduły custom</a>
+    <a href="#frontend">6. Frontend</a>
+    <a href="#patche">7. Łatki</a>
+    <a href="#cron">8. Crony PROD</a>
+    <a href="#plan">9. Plan aktualizacji</a>
+  </nav>
+
+  <main>
+
+    <!-- HERO -->
+    <div class="hero" id="podsumowanie">
+      <h1>🔧 Przygotowanie i analiza przed aktualizacją</h1>
+      <div class="version-flow">
+        <code class="version-pill v-from">2.4.8-p3</code>
+        <span class="v-arrow">→</span>
+        <code class="version-pill v-to">2.4.8-p5</code>
+        <span style="font-size:13px; color:var(--muted)">(patch bezpieczeństwa, ta sama linia 2.4.8)</span>
+      </div>
+      <div class="hero-meta">
+        <div class="meta-card">
+          <div class="label">Frontend</div>
+          <div class="value">Luma (child theme)</div>
+        </div>
+        <div class="meta-card">
+          <div class="label">Wyszukiwarka</div>
+          <div class="value">ElasticSuite 2.11 + OpenSearch 3.3</div>
+        </div>
+        <div class="meta-card">
+          <div class="label">Moduły</div>
+          <div class="value">~50 vendor / 49 app/code</div>
+        </div>
+        <div class="meta-card">
+          <div class="label">Konflikty composer</div>
+          <div class="value" style="color:var(--green)">brak</div>
+        </div>
+      </div>
+      <div class="success-box" style="margin-top:1rem; margin-bottom:0">
+        ✅ <code>composer why-not magento/product-community-edition 2.4.8-p5</code> – jedyną blokadą jest przypięte <code>"2.4.8-p3"</code> w root <code>composer.json</code>. Żaden moduł zewnętrzny nie blokuje przejścia.
+      </div>
+      <div class="warn-box" style="margin-bottom:0">
+        ⚠️ Kod jest gotowy do aktualizacji. Serwer produkcyjny nie jest: <strong>baza danych, Redis i Composer</strong> są poniżej wymagań Magento 2.4.8.
+      </div>
+    </div>
+
+    <!-- 01 BLOKERY -->
+    <div class="section" id="blokery">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="section-title">Do zrobienia na produkcji przed aktualizacją</span>
+      </div>
+
+      <p style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--red); margin-bottom:0.6rem">🔴 Wymagane</p>
+      <div class="blocker-list" style="margin-bottom:1.5rem">
+        <div class="blocker blocker-red">
+          <div class="blocker-num">#1</div>
+          <div class="blocker-body">
+            <h4>MariaDB 10.4.33 → 11.4 LTS (lub MySQL 8.4)</h4>
+            <p>10.4 nie ma wsparcia od 06.2024 i nie ma jej na liście wspieranych dla 2.4.8. Pakiet <code>+maria~deb10</code> pochodzi jeszcze z repozytorium dla Debiana 10. Migracja etapami (10.4 → 10.11 → 11.4, za każdym razem <code>mariadb-upgrade</code>) albo przez dump i import. Najpierw na kopii bazy – lokalnie backfill produkcji już działa na MariaDB 11.4.</p>
+          </div>
+        </div>
+        <div class="blocker blocker-red">
+          <div class="blocker-num">#2</div>
+          <div class="blocker-body">
+            <h4>Redis 6.0.20 → 7.2 lub Valkey 8</h4>
+            <p>Redis 6.0 jest EOL i spoza listy wspieranych wersji dla 2.4.8.</p>
+          </div>
+        </div>
+        <div class="blocker blocker-red">
+          <div class="blocker-num">#3</div>
+          <div class="blocker-body">
+            <h4>Composer 2.7.4 → 2.8+</h4>
+            <p>Wymóg 2.4.8. Wersje &lt; 2.7.7 mają dodatkowo CVE-2024-35241 / CVE-2024-35242. Wystarczy <code>composer self-update</code>, o ile mamy prawa do binarki (w <code>/usr/local/bin</code> potrzebny jest root).</p>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--orange); margin-bottom:0.6rem">🟡 Zalecane (nie blokuje p5)</p>
+      <div class="blocker-list">
+        <div class="blocker blocker-yellow">
+          <div class="blocker-num">#4</div>
+          <div class="blocker-body">
+            <h4>Debian 11 bullseye – bez wsparcia LTS od 31.08.2026</h4>
+            <p>Dotyczy STG i PROD. Na PROD działa dodatkowo jądro <code>4.19.0-26</code> z Debiana 10, więc prawdopodobnie zabrakło restartu po dist-upgrade. Migrację na Debian 12/13 zaplanować osobno.</p>
+          </div>
+        </div>
+        <div class="blocker blocker-yellow">
+          <div class="blocker-num">#5</div>
+          <div class="blocker-body">
+            <h4>Nginx 1.18 → ≥ 1.24</h4>
+            <p>Adobe testuje 2.4.8 na Nginx 1.26. Po aktualizacji robimy diff <code>nginx.conf.sample</code> p3 → p5 względem vhosta.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 SRODOWISKA -->
+    <div class="section" id="srodowisko">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <span class="section-title">Środowiska a wymagania 2.4.8-p5</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Komponent</th>
+              <th>DEV</th>
+              <th>STG</th>
+              <th>PROD</th>
+              <th>Wymagane 2.4.8</th>
+              <th>PROD</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Magento</strong></td>
+              <td>2.4.8-p3</td><td>2.4.8-p3</td><td>2.4.8-p3</td><td>–</td>
+              <td><span class="badge badge-green">🟢 OK</span></td>
+            </tr>
+            <tr>
+              <td><strong>Tryb</strong></td>
+              <td>developer</td><td>developer</td><td>production</td><td>production</td>
+              <td><span class="badge badge-green">🟢 OK</span></td>
+            </tr>
+            <tr>
+              <td><strong>PHP CLI</strong></td>
+              <td>8.3.20</td>
+              <td>8.3.33<div class="note">domyślne <code>php</code> = 8.1</div></td>
+              <td>8.3.27</td>
+              <td>8.3 / 8.4</td>
+              <td><span class="badge badge-green">🟢 OK</span></td>
+            </tr>
+            <tr>
+              <td><strong>PHP-FPM</strong></td>
+              <td>8.3</td>
+              <td>8.3<div class="note">+ 7.4, 8.1, 8.2 na serwerze</div></td>
+              <td>8.3</td>
+              <td>8.3 / 8.4</td>
+              <td><span class="badge badge-green">🟢 OK</span></td>
+            </tr>
+            <tr>
+              <td><strong>Baza danych</strong></td>
+              <td>MariaDB 11.4.8</td>
+              <td>MySQL 8.0.33</td>
+              <td>MariaDB 10.4.33</td>
+              <td>MariaDB 11.4 / MySQL 8.4</td>
+              <td><span class="badge badge-red">🔴 Wymagana zmiana</span></td>
+            </tr>
+            <tr>
+              <td><strong>Search engine</strong></td>
+              <td>OpenSearch 3.3.2</td>
+              <td>Elasticsearch 8.19.20</td>
+              <td>OpenSearch 3.3.2</td>
+              <td>OpenSearch 2.19 / ES 8.17</td>
+              <td><span class="badge badge-green">🟢 OK</span></td>
+            </tr>
+            <tr>
+              <td><strong>Redis</strong></td>
+              <td>7.2.7</td><td>7.4.1</td><td>6.0.20</td><td>7.2 / Valkey 8</td>
+              <td><span class="badge badge-red">🔴 Wymagana zmiana</span></td>
+            </tr>
+            <tr>
+              <td><strong>Composer</strong></td>
+              <td>2.8.8</td><td>2.10.1</td><td>2.7.4</td><td>2.8</td>
+              <td><span class="badge badge-red">🔴 Wymagana zmiana</span></td>
+            </tr>
+            <tr>
+              <td><strong>Nginx</strong></td>
+              <td>1.16.1</td>
+              <td>1.31.4<div class="note">Apache zainstalowany, inactive</div></td>
+              <td>1.18.0</td>
+              <td>1.26</td>
+              <td><span class="badge badge-yellow">🟡 Zalecana</span></td>
+            </tr>
+            <tr>
+              <td><strong>Varnish</strong></td>
+              <td>7.7.3</td><td>brak</td><td>brak<div class="note">wbudowany FPC</div></td><td>7.6 (opcjonalny)</td>
+              <td><span class="badge badge-gray">n/d</span></td>
+            </tr>
+            <tr>
+              <td><strong>RabbitMQ</strong></td>
+              <td>brak</td><td>brak</td><td>brak</td><td>4.1 (opcjonalny)</td>
+              <td><span class="badge badge-gray">n/d</span><div class="note">kolejki przez MySQL</div></td>
+            </tr>
+            <tr>
+              <td><strong>System</strong></td>
+              <td>CentOS Stream 9 (kontener)</td>
+              <td>Debian 11</td>
+              <td>Debian 11<div class="note">jądro 4.19 (buster)</div></td>
+              <td>–</td>
+              <td><span class="badge badge-yellow">🟡 EOL LTS</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-box">
+        ℹ️ PHP 8.3 na STG i PROD ma komplet rozszerzeń wymaganych przez Magento (bcmath, ctype, curl, dom, fileinfo, gd, intl, mbstring, openssl, pdo_mysql, simplexml, soap, sockets, sodium, xsl, zip…). <code>memory_limit</code> w CLI = <code>-1</code>. ionCube i SourceGuardian nie są potrzebne, bo w <code>app/code</code> ani <code>vendor</code> nie ma zakodowanych plików.
+      </div>
+      <div class="info-box">
+        ℹ️ W <code>env.php</code> na PROD zostały martwe klucze <code>elasticsearch7_*</code> (port 9200) po starszym Magento. ElasticSuite łączy się z OpenSearch na porcie <code>9201</code>. Klucze można usunąć przy aktualizacji.
+      </div>
+    </div>
+
+    <!-- 03 STG -->
+    <div class="section" id="stg">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <span class="section-title">STG nie odwzorowuje PROD</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Element</th><th>STG</th><th>PROD</th><th>Wpływ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Baza danych</strong></td><td>MySQL 8.0.33</td><td>MariaDB 10.4.33</td>
+              <td><span class="badge badge-red">🔴 inny silnik</span><div class="note">Test <code>setup:upgrade</code> i wydajności nie będzie miarodajny</div></td>
+            </tr>
+            <tr>
+              <td><strong>Search engine</strong></td><td>Elasticsearch 8.19</td><td>OpenSearch 3.3.2</td>
+              <td><span class="badge badge-red">🔴 inny silnik</span></td>
+            </tr>
+            <tr>
+              <td><strong>Tryb</strong></td><td>developer</td><td>production</td>
+              <td><span class="badge badge-yellow">🟡 przełączyć</span></td>
+            </tr>
+            <tr>
+              <td><strong>Domyślne PHP CLI</strong></td><td>8.1</td><td>8.3</td>
+              <td><span class="badge badge-yellow">🟡 <code>update-alternatives</code></span><div class="note">cron na STG wywołuje <code>php8.3</code> wprost – OK</div></td>
+            </tr>
+            <tr>
+              <td><strong>Redis</strong></td><td>7.4.1</td><td>6.0.20</td>
+              <td><span class="badge badge-gray">wyrównać po aktualizacji PROD</span></td>
+            </tr>
+            <tr>
+              <td><strong>Crony integracji</strong></td><td>tylko <code>cron:run</code></td><td>9 zadań</td>
+              <td><span class="badge badge-yellow">🟡 importy tylko ręcznie</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warn-box">
+        ⚠️ Docelowo STG powinien stać na tej konfiguracji, na którą podniesiemy PROD: <strong>MariaDB 11.4, OpenSearch 3.3, Redis 7.2 / Valkey 8, Nginx, tryb production, domyślne PHP 8.3</strong>.
+      </div>
+    </div>
+
+    <!-- 04 VENDOR -->
+    <div class="section" id="vendor">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <span class="section-title">Moduły vendor (composer)</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Pakiet</th><th>Wersja</th><th>Najnowsza</th><th>Status</th><th>Uwagi</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>smile/elasticsuite</code></td><td><code>2.11.16.1</code></td><td><code>2.12.1.1</code></td><td><span class="badge badge-green">🟢 OK</span></td><td>Linia 2.11.x dla 2.4.8, 2.12 dla 2.4.9 – zostajemy na 2.11.</td></tr>
+            <tr><td><code>amasty/module-single-step-checkout</code></td><td><code>4.4.6</code></td><td><code>4.4.9</code></td><td><span class="badge badge-blue">🔵 patch</span></td><td>Można podnieść razem z aktualizacją.</td></tr>
+            <tr><td><code>amasty/orderattr</code></td><td><code>3.15.1</code></td><td><code>4.0.1</code></td><td><span class="badge badge-yellow">🟡 major</span></td><td>Nowa wersja główna – przeczytać changelog przed podniesieniem.</td></tr>
+            <tr><td><code>pay-now/paynow-magento2</code></td><td><code>1.5.9</code></td><td><code>2.0.2</code></td><td><span class="badge badge-yellow">🟡 major</span></td><td>Bramka płatności – ewentualną zmianę testować osobno.</td></tr>
+            <tr><td><code>magefan/module-product-grid-inline</code></td><td><code>2.1.6</code></td><td><code>2.4.1</code></td><td><span class="badge badge-red">🔴 licencja</span></td><td>Wygasła licencja – nowsza wersja niedostępna.</td></tr>
+            <tr><td><code>mirasvit/module-gtm</code></td><td><code>1.2.61</code></td><td><code>2.0.14</code></td><td><span class="badge badge-red">🔴 licencja</span></td><td>Wygasła subskrypcja – 2.x niedostępne.</td></tr>
+            <tr><td><code>mirasvit/module-navigation</code></td><td><code>2.7.5</code></td><td>–</td><td><span class="badge badge-red">🔴 licencja</span></td><td>Wygasła subskrypcja. Część podmodułów wyłączona (LayeredNavigation, Brand, Scroll, AllProducts, SeoNavigation, QuickNavigation).</td></tr>
+            <tr><td><code>mageplaza/module-smtp</code></td><td><code>4.7.20</code></td><td><code>4.7.26</code></td><td><span class="badge badge-blue">🔵 patch</span></td><td></td></tr>
+            <tr><td><code>bsscommerce/b2b-registration</code></td><td><code>1.4.3</code></td><td><code>1.4.4</code></td><td><span class="badge badge-blue">🔵 patch</span></td><td></td></tr>
+            <tr><td><code>bsscommerce/hideprice</code></td><td><code>1.3.3.1</code></td><td><code>1.3.4</code></td><td><span class="badge badge-gray">wyłączony</span></td><td>Moduł <code>Bss_HidePrice</code> jest wyłączony.</td></tr>
+            <tr><td><code>baldwin/magento2-module-image-cleanup</code></td><td><code>1.2.6</code></td><td><code>1.2.7</code></td><td><span class="badge badge-blue">🔵 patch</span></td><td>Używany w cronie na PROD.</td></tr>
+            <tr><td><code>magestyapps/module-web-images</code></td><td><code>1.2.0</code></td><td><code>1.2.1</code></td><td><span class="badge badge-blue">🔵 patch</span></td><td></td></tr>
+            <tr><td><code>yireo/magento2-webp2</code></td><td><code>0.13.5</code></td><td><code>0.14.3</code></td><td><span class="badge badge-gray">opcjonalnie</span></td><td></td></tr>
+            <tr><td><code>mageplaza/magento-2-polish-language-pack</code></td><td><code>dev-master</code></td><td>–</td><td><span class="badge badge-yellow">🟡 dev-master</span></td><td>Bez wersji semver – rozważyć przypięcie do commita.</td></tr>
+            <tr><td><code>cweagans/composer-patches</code></td><td><code>1.7.3</code></td><td><code>2.0.0</code></td><td><span class="badge badge-yellow">🟡 nie podnosić</span></td><td>2.x zmienia sposób definiowania łatek.</td></tr>
+            <tr><td><code>phpoffice/phpspreadsheet</code></td><td><code>1.30.1</code></td><td><code>5.10.0</code></td><td><span class="badge badge-green">🟢 OK</span></td><td>Wymaga <code>php &lt;8.5</code> – na 8.3 / 8.4 OK, zostajemy na 1.x.</td></tr>
+            <tr><td><code>magefan/module-blog</code> (+ graph-ql)</td><td><code>2.13.1</code></td><td>aktualna</td><td><span class="badge badge-green">🟢 OK</span></td><td></td></tr>
+            <tr><td><code>mageplaza/module-order-export</code>, <code>share-cart</code></td><td><code>4.1.6</code> / <code>4.0.6</code></td><td>aktualna</td><td><span class="badge badge-green">🟢 OK</span></td><td></td></tr>
+            <tr><td><code>weltpixel/m2-weltpixel-quickview</code></td><td><code>1.15.3</code></td><td>aktualna</td><td><span class="badge badge-green">🟢 OK</span></td><td><code>magento/framework 103.0.*</code> – zgodne z p5.</td></tr>
+            <tr><td><code>angeo/module-llms-txt</code>, <code>experius/module-csp</code>, <code>prince/module-faq</code></td><td>–</td><td>aktualna</td><td><span class="badge badge-green">🟢 OK</span></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-box">
+        ℹ️ p5 to wydanie bezpieczeństwa w tej samej linii (<code>magento/framework 103.0.8-p5</code>). Moduły z ograniczeniem <code>103.0.*</code> / <code>^103.0</code> są zgodne. Moduły z wygasłą licencją zostają na obecnych wersjach. Na p5 to nie przeszkadza, temat wróci przy 2.4.9.
+      </div>
+    </div>
+
+    <!-- 05 CUSTOM -->
+    <div class="section" id="custom">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <span class="section-title">Moduły custom (app/code) – audyt PHP 8.3 / 8.4</span>
+      </div>
+
+      <div class="stack-grid">
+        <span class="stack-tag accent">Network/* ×41</span>
+        <span class="stack-tag">CA/CARaty</span>
+        <span class="stack-tag">ForMage/Base</span>
+        <span class="stack-tag">ForMage/PriceTracker</span>
+        <span class="stack-tag">Smartmage/Inpost</span>
+        <span class="stack-tag">Webcooking/Core</span>
+        <span class="stack-tag">Webcooking/SimpleBundle</span>
+        <span class="stack-tag">Aregowe/PolyShellProtection</span>
+        <span class="stack-tag">Zwernemann/Withdrawal</span>
+        <span class="stack-tag">MAGMI 0.7.24 (remag7)</span>
+      </div>
+
+      <div class="success-box">
+        ✅ <strong>0 błędów krytycznych</strong> na PHP 8.3 / 8.4 (PHPCompatibility + Rector). Wszystkie trafienia to deprecation notices, które staną się fatal dopiero w PHP 9.0.
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="php-table">
+          <thead>
+            <tr><th>Moduł</th><th>Pliki</th><th>Kategorie</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Network/AmpIntegration</td><td>2</td><td>dynamiczne właściwości, null → funkcje stringowe, nadmiar argumentów <span class="badge badge-yellow">cron PROD</span></td></tr>
+            <tr><td>Network/AspireIntegration</td><td>3</td><td>dynamiczne właściwości <span class="badge badge-yellow">cron PROD</span></td></tr>
+            <tr><td>Network/ProbikeIntegration</td><td>3</td><td><code>utf8_encode</code>, dynamiczne właściwości, null → funkcje stringowe</td></tr>
+            <tr><td>Network/KellyIntegration</td><td>2</td><td>dynamiczne właściwości</td></tr>
+            <tr><td>Network/PolsportIntegration</td><td>2</td><td>dynamiczne właściwości</td></tr>
+            <tr><td>Network/Comparisonsites</td><td>2</td><td>dynamiczne właściwości</td></tr>
+            <tr><td>Network/ContactBcc</td><td>1</td><td>dynamiczne właściwości, <code>?Type</code>, null → funkcje stringowe</td></tr>
+            <tr><td>Network/CategoriesList</td><td>1</td><td>nadmiar argumentów (do sprawdzenia, czy to bug)</td></tr>
+            <tr><td>Smartmage/Inpost</td><td>1</td><td>dynamiczne właściwości, nadmiar argumentów</td></tr>
+            <tr><td>Webcooking/Core</td><td>5</td><td>dynamiczne właściwości, <code>?Type</code>, null → funkcje stringowe</td></tr>
+            <tr><td>Webcooking/SimpleBundle</td><td>9</td><td>dynamiczne właściwości, <code>?Type</code>, null → funkcje stringowe, nadmiar argumentów</td></tr>
+            <tr><td>AliorBank/Raty</td><td>1</td><td><code>?Type</code> <span class="badge badge-gray">tylko na gałęziach feature</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-box">
+        ℹ️ <code>ForMage/*</code> (4mage) przeniesiono z <code>vendor/</code> do <code>app/code</code> z powodu wygasłej licencji. MAGMI ma przygotowaną łatkę pod PHP 8.3 / 8.4. <code>Aregowe/PolyShellProtection</code> i <code>Zwernemann/Withdrawal</code> doszły po audycie i trzeba je jeszcze sprawdzić.
+      </div>
+    </div>
+
+    <!-- 06 FRONTEND -->
+    <div class="section" id="frontend">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <span class="section-title">Frontend</span>
+      </div>
+
+      <div class="stack-grid">
+        <span class="stack-tag accent">Network/ni_b2b ← Magento/luma</span>
+        <span class="stack-tag accent">LESS</span>
+        <span class="stack-tag accent">RequireJS</span>
+        <span class="stack-tag accent">KnockoutJS</span>
+        <span class="stack-tag">jQuery / jQuery UI</span>
+        <span class="stack-tag">Owl Carousel</span>
+        <span class="stack-tag">Page Builder</span>
+        <span class="stack-tag">WebP (yireo/webp2)</span>
+        <span class="stack-tag">Node 20 (bez własnego builda)</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Nadpisanie w motywie</th><th>Ryzyko</th><th>Działanie</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>Magento_Checkout/web/js/view/minicart.js</code></td><td><span class="badge badge-yellow">🟡 średnie</span></td><td>diff z wersją p5</td></tr>
+            <tr><td><code>Smile_ElasticsuiteCore/web/js/form-mini.js</code></td><td><span class="badge badge-yellow">🟡 średnie</span></td><td>diff z wersją p5</td></tr>
+            <tr><td>Szablony <code>Magento_Checkout</code>, <code>Magento_Customer</code>, <code>Magento_Sales</code>, <code>Amasty_Checkout</code></td><td><span class="badge badge-yellow">🟡 średnie</span></td><td>diff z vendor p3 → p5 dla tych samych ścieżek</td></tr>
+            <tr><td>Pozostałe (<code>Magento_Catalog</code>, <code>Magefan_Blog</code>, <code>WeltPixel_Quickview</code>, <code>Mirasvit_LayeredNavigation</code>…)</td><td><span class="badge badge-green">🟢 niskie</span></td><td>test wizualny</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 07 PATCHE -->
+    <div class="section" id="patche">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <span class="section-title">Łatki do przeglądu</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Łatka</th><th>Status</th><th>Działanie</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>m2-hotfixes/VULN-39341_248-p3.patch</code></td><td><span class="badge badge-yellow">🟡 prawdopodobnie zbędna</span></td><td>Sprawdzić, czy jest w p4/p5. Jeśli tak, usunąć, bo nie nałoży się na nowy kod.</td></tr>
+            <tr><td><code>composer/add_title_to_menu_items.patch</code> (module-theme)</td><td><span class="badge badge-yellow">🟡 weryfikacja</span></td><td>Sprawdzić, czy nakłada się na p5. <code>composer-exit-on-patch-failure: true</code> przerwie instalację, jeśli się nie nałoży.</td></tr>
+            <tr><td><code>extra.patches["4mage/m2-price-tracker"]</code></td><td><span class="badge badge-red">🔴 martwy wpis</span></td><td>Pakietu nie ma już w vendor (jest w <code>app/code</code>) – usunąć wpis.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 08 CRON -->
+    <div class="section" id="cron">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <span class="section-title">Crony na PROD – do testu regresji</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Harmonogram</th><th>Polecenie</th><th>Moduł</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>* * * * *</code></td><td><code>cron:run</code></td><td>Magento</td></tr>
+            <tr><td><code>*/5 * * * *</code></td><td><code>updatecustomavailability:updateavail</code></td><td>Network/UpdateCustomAvailability</td></tr>
+            <tr><td><code>*/30 * * * *</code></td><td><code>leaselink:status</code></td><td>Network/LeaseLink</td></tr>
+            <tr><td><code>0 2 * * *</code></td><td><code>polsport:import</code></td><td>Network/Polsport</td></tr>
+            <tr><td><code>0 3 * * *</code></td><td><code>aspire:import</code></td><td>Network/AspireIntegration</td></tr>
+            <tr><td><code>40 2 * * *</code></td><td><code>network:ampintegration:import-products</code></td><td>Network/AmpIntegration</td></tr>
+            <tr><td><code>40 3 * * *</code></td><td><code>network:larixintegration:import</code></td><td>Network/LarixIntegration</td></tr>
+            <tr><td><code>0 6 * * 1,4</code></td><td><code>catalog:images:remove-unused-hash-directories -n</code></td><td>baldwin/image-cleanup</td></tr>
+            <tr><td><code>10 6 * * 1,4</code></td><td><code>catalog:images:remove-unused-files -n</code></td><td>baldwin/image-cleanup</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="success-box">
+        ✅ Wszystkie zadania wywołują <code>/usr/bin/php8.3</code> wprost.
+      </div>
+    </div>
+
+    <!-- 09 PLAN -->
+    <div class="section" id="plan">
+      <div class="section-header">
+        <span class="section-num">09</span>
+        <span class="section-title">Plan aktualizacji</span>
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item critical">
+          <div class="tl-card">
+            <div class="tl-top"><span class="tl-step">Etap 01</span><span class="tl-env">PROD (hosting)</span></div>
+            <h4>Podniesienie usług na produkcji</h4>
+            <p>MariaDB 10.4 → 11.4, Redis 6.0 → 7.2 / Valkey 8, Composer 2.7 → 2.8+. Przy okazji restart na aktualne jądro.</p>
+          </div>
+        </div>
+        <div class="tl-item critical">
+          <div class="tl-card">
+            <div class="tl-top"><span class="tl-step">Etap 02</span><span class="tl-env">STG (hosting)</span></div>
+            <h4>Wyrównanie STG z PROD</h4>
+            <p>MySQL → MariaDB 11.4, Elasticsearch → OpenSearch 3.3, tryb <code>production</code>, domyślne PHP 8.3, świeża kopia bazy z produkcji.</p>
+          </div>
+        </div>
+        <div class="tl-item normal">
+          <div class="tl-card">
+            <div class="tl-top"><span class="tl-step">Etap 03</span><span class="tl-env">Lokalnie (Warden)</span></div>
+            <h4>Aktualizacja kodu do 2.4.8-p5</h4>
+            <p>Osobna gałąź od <code>develop</code>. Przegląd łatek, diff nadpisań frontendu, poprawki deprecation w <code>app/code</code>.</p>
+          </div>
+        </div>
+        <div class="tl-item warn">
+          <div class="tl-card">
+            <div class="tl-top"><span class="tl-step">Etap 04</span><span class="tl-env">STG</span></div>
+            <h4>Wdrożenie i testy regresji</h4>
+            <p>Checkout Amasty, płatności (Paynow, raty CA, LeaseLink), InPost, rejestracja B2B, wyszukiwarka i filtry, blog, import MAGMI, ręczne uruchomienie cronów integracji.</p>
+          </div>
+        </div>
+        <div class="tl-item critical">
+          <div class="tl-card">
+            <div class="tl-top"><span class="tl-step">Etap 05</span><span class="tl-env">PROD</span></div>
+            <h4>Wdrożenie na produkcję</h4>
+            <p>Pełny backup bazy i plików, okno serwisowe w godzinach małego ruchu, gotowy plan wycofania.</p>
+          </div>
+        </div>
+        <div class="tl-item normal">
+          <div class="tl-card">
+            <div class="tl-top"><span class="tl-step">Etap 06</span><span class="tl-env">PROD</span></div>
+            <h4>Weryfikacja po wdrożeniu</h4>
+            <p>Ta sama lista testów co na STG, a przez kolejne dni monitoring zamówień, importów i logów.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">⌘ aktualizacja (DEV / STG)</div>
+<pre>composer require magento/product-community-edition:2.4.8-p5 --no-update
+composer update "magento/*" --with-all-dependencies
+bin/magento maintenance:enable
+bin/magento setup:upgrade
+bin/magento setup:di:compile
+bin/magento setup:static-content:deploy pl_PL en_US -f
+bin/magento cache:flush
+bin/magento maintenance:disable</pre>
+      </div>
+      <div class="info-box">
+        ℹ️ Na STG wszystkie polecenia uruchamiamy jawnie przez <code>php8.3</code> (np. <code>php8.3 bin/magento …</code>), dopóki domyślne <code>php</code> wskazuje na 8.1.
+      </div>
+    </div>
+
+    <p style="font-size:12px; color:var(--muted); margin-top:2rem">Dane zebrane 2026-09-25 z DEV (Warden), STG i PROD.</p>
+
+  </main>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.section, .hero');
+  const links = document.querySelectorAll('nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const target = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (target) target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.25 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
